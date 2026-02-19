@@ -10,6 +10,9 @@ namespace Backend.Repo.Interface
     public interface IAuthRepository
     {
         Task<User?> GetUserByEmailAsync(string email);
+
+        
+        Task<string?> GetAppSettingValueAsync(string key);
     }
 
 }

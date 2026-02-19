@@ -1,22 +1,16 @@
-﻿using Backend.Common;
-using Backend.Common.DTO;
+﻿using Backend.Common.DTO;
 using Backend.Repo.Interface;
 using Backend.Service.Interface;
 using Backend.SQLContext.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Backend.Service.Implement
 {
-
-
     public class AuthService : IAuthService
     {
         private readonly IAuthRepository _repo;
@@ -47,7 +41,7 @@ namespace Backend.Service.Implement
             if (!validPassword)
                 return null;
 
-            var token = GenerateJwt(user);
+            var token = await GenerateJwtAsync(user);
 
             return new LoginResponseDto
             {
@@ -63,7 +57,8 @@ namespace Backend.Service.Implement
             return Task.FromResult(true);
         }
 
-        private string GenerateJwt(User user)
+        // CHANGE THIS: Method is now Async and returns Task<string>
+        private async Task<string> GenerateJwtAsync(User user)
         {
             var key = _config["Jwt:Key"];
             var issuer = _config["Jwt:Issuer"];
@@ -71,23 +66,28 @@ namespace Backend.Service.Implement
 
             var claims = new[]
             {
-            new Claim("UserId", user.Userid.ToString()),
-            new Claim("Email", user.Emailid),
-            new Claim("RoleId", user.Roleid?.ToString() ?? "")
-        };
+                new Claim("UserId", user.Userid.ToString()),
+                new Claim("Email", user.Emailid),
+                new Claim("RoleId", user.Roleid?.ToString() ?? "")
+            };
 
-            var securityKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(key!));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key!));
+            var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var creds = new SigningCredentials(
-                securityKey,
-                SecurityAlgorithms.HmacSha256);
+            
+            var expirationSetting = await _repo.GetAppSettingValueAsync("JwtExpirationMinutes");   // fetch expire Timing From DB
+
+            int expirationMinutes = 60;
+            if (!string.IsNullOrEmpty(expirationSetting) && int.TryParse(expirationSetting, out int parsedMinutes))
+            {
+                expirationMinutes = parsedMinutes;
+            }
 
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(2),
+                expires: DateTime.UtcNow.AddMinutes(expirationMinutes), 
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

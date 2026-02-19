@@ -15,6 +15,8 @@ public partial class AppDbContext : DbContext
     {
     }
 
+    public virtual DbSet<Appsetting> Appsettings { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -25,6 +27,30 @@ public partial class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Appsetting>(entity =>
+        {
+            entity.HasKey(e => e.Settingid).HasName("app_settings_pkey");
+
+            entity.ToTable("appsetting");
+
+            entity.HasIndex(e => e.Settingkey, "uq_settingkey").IsUnique();
+
+            entity.Property(e => e.Settingid)
+                .UseIdentityAlwaysColumn()
+                .HasColumnName("settingid");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Modifiedat)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("modifiedat");
+            entity.Property(e => e.Modifiedby).HasColumnName("modifiedby");
+            entity.Property(e => e.Settingkey)
+                .HasMaxLength(100)
+                .HasColumnName("settingkey");
+            entity.Property(e => e.Settingvalue)
+                .HasMaxLength(255)
+                .HasColumnName("settingvalue");
+        });
+
         modelBuilder.Entity<Role>(entity =>
         {
             entity.HasKey(e => e.Roleid).HasName("role_pkey");

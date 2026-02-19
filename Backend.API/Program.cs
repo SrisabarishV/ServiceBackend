@@ -69,18 +69,16 @@ builder.Services.AddAuthentication(options =>
     {
         OnTokenValidated = context =>
         {
-            var blacklist =
-                context.HttpContext.RequestServices
-                .GetRequiredService<ITokenBlacklistService>();
+            var blacklist = context.HttpContext.RequestServices
+                                   .GetRequiredService<ITokenBlacklistService>();
 
-            var jwtToken = context.SecurityToken as JwtSecurityToken;
+            var authHeader = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
 
-            var token = jwtToken?.RawData;
+            var token = authHeader?.Split(" ").Last();
 
-            if (!string.IsNullOrEmpty(token) &&
-                blacklist.IsRevoked(token))
+            if (!string.IsNullOrEmpty(token) && blacklist.IsRevoked(token))
             {
-                context.Fail("Token revoked");
+                context.Fail("Token has been revoked.");
             }
 
             return Task.CompletedTask;

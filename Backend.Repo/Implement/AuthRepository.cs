@@ -23,5 +23,12 @@ namespace Backend.Repo.Implement
             return await _context.Users
                 .FirstOrDefaultAsync(x => x.Emailid == email && x.Isactive);
         }
+        public async Task<string?> GetAppSettingValueAsync(string key)
+        {
+            var setting = await _context.Appsettings
+                .FirstOrDefaultAsync(x => x.Settingkey == key);
+
+            return setting?.Settingvalue;
+        }
     }
 }
