@@ -21,13 +21,15 @@ public partial class User
 
     public bool Isactive { get; set; }
 
-    public DateTime Createdat { get; set; }
+    public DateTime? Createdat { get; set; }
 
     public long? Createdby { get; set; }
 
-    public DateTime Modifiedat { get; set; }
+    public DateTime? Modifiedat { get; set; }
 
     public long? Modifiedby { get; set; }
+
+    public virtual ICollection<RecentActivity> RecentActivities { get; set; } = new List<RecentActivity>();
 
     public virtual Role? Role { get; set; }
 }

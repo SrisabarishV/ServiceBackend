@@ -18,7 +18,7 @@ namespace Backend.Service.Implement
             _repo = repo;
         }
 
-        public async Task<ApiResponse<UserResponseDto>> CreateAsync(CreateUserDto dto, long createdBy)
+        public async Task<ApiResponse<UserResponseDto>> CreateAsync(CreateUserDto dto)
         {
             try
             {
@@ -34,8 +34,8 @@ namespace Backend.Service.Implement
                     Passwordhash = BCrypt.Net.BCrypt.HashPassword(dto.Password), // hash recommended
                     Roleid = dto.Roleid,
                     Isactive = true,
-                    Createdat = DateTime.UtcNow,
-                    Createdby = createdBy,
+                    Createdat = DateTime.UtcNow
+                    
                     
                 };
 
@@ -55,7 +55,9 @@ namespace Backend.Service.Implement
             }
             catch (Exception ex)
             {
-                return ApiResponse<UserResponseDto>.FailResponse(ex.Message);
+                var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                return ApiResponse<UserResponseDto>.FailResponse(errorMessage);
+                //return ApiResponse<UserResponseDto>.FailResponse(ex.Message);
             }
         }
 

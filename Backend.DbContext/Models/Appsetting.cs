@@ -13,7 +13,7 @@ public partial class Appsetting
 
     public string? Description { get; set; }
 
-    public DateTime Modifiedat { get; set; }
+    public DateTime? Modifiedat { get; set; }
 
     public long? Modifiedby { get; set; }
 }
