@@ -10,7 +10,7 @@ namespace Backend.Service.Interface
 {
     public interface IUserService
     {
-        Task<ApiResponse<UserResponseDto>> CreateAsync(CreateUserDto dto, long createdBy);
+        Task<ApiResponse<UserResponseDto>> CreateAsync(CreateUserDto dto);
         Task<ApiResponse<UserResponseDto>> GetByIdAsync(long id);
         Task<ApiResponse<List<UserResponseDto>>> GetAllAsync();
         Task<ApiResponse<string>> UpdateAsync(UpdateUserDto dto, long modifiedBy);

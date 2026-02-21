@@ -15,7 +15,7 @@ public partial class Role
 
     public long? Createdby { get; set; }
 
-    public DateTime Modifiedat { get; set; }
+    public DateTime? Modifiedat { get; set; }
 
     public long? Modifiedby { get; set; }
 

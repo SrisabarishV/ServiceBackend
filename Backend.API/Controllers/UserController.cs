@@ -23,16 +23,7 @@ namespace Backend.API.Controllers
         {
             try
             {
-                var userIdClaim = User.FindFirst("UserId")?.Value;
-
-                if (string.IsNullOrEmpty(userIdClaim))
-                {
-                    return Ok(ApiResponse<object>.FailResponse("Invalid token"));
-                }
-
-                var userId = long.Parse(userIdClaim);
-
-                var result = await _service.CreateAsync(dto, userId);
+                var result = await _service.CreateAsync(dto);
 
                 return Ok(result);
             }
