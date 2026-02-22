@@ -9,22 +9,25 @@ namespace Backend.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    [Authorize]
+    public class DriverController : ControllerBase
     {
-        private readonly IUserService _service;
+        private readonly IDriverService _service;
 
-        public UsersController(IUserService service)
+        public DriverController(IDriverService service)
         {
             _service = service;
         }
 
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> Create(CreateUserDto dto)
+        [HttpPost("CreateDriver")]
+        public async Task<IActionResult> Create(CreateDriverDto dto)
         {
             try
             {
-                var result = await _service.CreateAsync(dto);
+               
+                var userId = long.Parse(User.FindFirst("UserId")!.Value);
 
+                var result = await _service.CreateAsync(dto, userId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -33,13 +36,12 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpGet("GetUserById")]
+        [HttpGet("GetByDriverID")]
         public async Task<IActionResult> GetById(long id)
         {
             try
             {
                 var result = await _service.GetByIdAsync(id);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -48,14 +50,12 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpGet("GetAllUser")]
-        [Authorize]
+        [HttpGet("GetAllDriver")]
         public async Task<IActionResult> GetAll()
         {
             try
             {
                 var result = await _service.GetAllAsync();
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -64,21 +64,16 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> Update(long userids,UpdateUserDto dto)
+        [HttpPut("UpdateDriver")]
+        public async Task<IActionResult> Update(long driverid ,UpdateDriverDto dto)
         {
             try
             {
-                var userIdClaim = User.FindFirst("UserId")?.Value;
+                
+                var userId = long.Parse(User.FindFirst("UserId")!.Value);
 
-                if (string.IsNullOrEmpty(userIdClaim))
-                {
-                    return Ok(ApiResponse<object>.FailResponse("Invalid token"));
-                }
-                var userId = long.Parse(userIdClaim);
-
-                var result = await _service.UpdateAsync(userids,dto, userId);
-
+               
+                var result = await _service.UpdateAsync(driverid, dto, userId);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -87,18 +82,12 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpDelete("DeleteUser")]
+        [HttpDelete("DeleteDriver")]
         public async Task<IActionResult> Delete(long id)
         {
             try
             {
-                var userIdClaim = User.FindFirst("UserId")?.Value;
-
-                if (string.IsNullOrEmpty(userIdClaim))
-                {
-                    return Ok(ApiResponse<object>.FailResponse("Invalid token"));
-                }
-                var userId = long.Parse(userIdClaim);
+                var userId = long.Parse(User.FindFirst("UserId")!.Value);
 
                 var result = await _service.DeleteAsync(id, userId);
 
@@ -110,4 +99,5 @@ namespace Backend.API.Controllers
             }
         }
     }
+
 }

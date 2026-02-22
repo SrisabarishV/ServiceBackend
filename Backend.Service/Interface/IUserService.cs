@@ -13,7 +13,7 @@ namespace Backend.Service.Interface
         Task<ApiResponse<UserResponseDto>> CreateAsync(CreateUserDto dto);
         Task<ApiResponse<UserResponseDto>> GetByIdAsync(long id);
         Task<ApiResponse<List<UserResponseDto>>> GetAllAsync();
-        Task<ApiResponse<string>> UpdateAsync(UpdateUserDto dto, long modifiedBy);
+        Task<ApiResponse<string>> UpdateAsync(long userids,UpdateUserDto dto, long modifiedBy);
         Task<ApiResponse<string>> DeleteAsync(long id, long modifiedBy);
     }
 }

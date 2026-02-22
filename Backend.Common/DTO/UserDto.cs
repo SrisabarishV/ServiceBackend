@@ -19,7 +19,7 @@ namespace Backend.Common.DTO
 
     public class UpdateUserDto
     {
-        public long Userid { get; set; }
+        
         public string Firstname { get; set; } = default!;
         public string? Lastname { get; set; }
         public string? Phonenumber { get; set; }
@@ -34,6 +34,8 @@ namespace Backend.Common.DTO
         public string Emailid { get; set; } = default!;
         public string? Phonenumber { get; set; }
         public long? Roleid { get; set; }
+        public string? Rolename { get; set; }
+
     }
 
 

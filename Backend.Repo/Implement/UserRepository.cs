@@ -23,12 +23,14 @@ namespace Backend.Repo.Implement
         public async Task<User?> GetByIdAsync(long id)
         {
             return await _context.Users
+                .Include(x => x.Role)   
                 .FirstOrDefaultAsync(x => x.Userid == id && x.Isactive);
         }
 
         public async Task<List<User>> GetAllAsync()
         {
             return await _context.Users
+                .Include(x => x.Role)   
                 .Where(x => x.Isactive)
                 .ToListAsync();
         }
@@ -49,7 +51,7 @@ namespace Backend.Repo.Implement
 
         public async Task<bool> SoftDeleteAsync(User user)
         {
-            user.Isactive = false;
+            
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
             return true;
