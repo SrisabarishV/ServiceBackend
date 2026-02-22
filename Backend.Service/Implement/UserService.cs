@@ -48,16 +48,16 @@ namespace Backend.Service.Implement
                     Lastname = result.Lastname,
                     Emailid = result.Emailid,
                     Phonenumber = result.Phonenumber,
-                    Roleid = result.Roleid
+                    Roleid = result.Roleid,
+                    Rolename = result.Role?.Rolename
                 };
 
                 return ApiResponse<UserResponseDto>.SuccessResponse(response, "User created successfully");
             }
             catch (Exception ex)
             {
-                var errorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-                return ApiResponse<UserResponseDto>.FailResponse(errorMessage);
-                //return ApiResponse<UserResponseDto>.FailResponse(ex.Message);
+               
+                return ApiResponse<UserResponseDto>.FailResponse(ex.Message);
             }
         }
 
@@ -78,7 +78,9 @@ namespace Backend.Service.Implement
                     Lastname = user.Lastname,
                     Emailid = user.Emailid,
                     Phonenumber = user.Phonenumber,
-                    Roleid = user.Roleid
+                    Roleid = user.Roleid,
+                    Rolename =user.Role?.Rolename
+                    
                 };
 
                 return ApiResponse<UserResponseDto>.SuccessResponse(dto);
@@ -103,7 +105,8 @@ namespace Backend.Service.Implement
                     Lastname = x.Lastname,
                     Emailid = x.Emailid,
                     Phonenumber = x.Phonenumber,
-                    Roleid = x.Roleid
+                    Roleid = x.Roleid,
+                    Rolename = x.Role?.Rolename
                 }).ToList();
 
                 return ApiResponse<List<UserResponseDto>>.SuccessResponse(list);
@@ -115,11 +118,11 @@ namespace Backend.Service.Implement
         }
 
 
-        public async Task<ApiResponse<string>> UpdateAsync(UpdateUserDto dto, long modifiedBy)
+        public async Task<ApiResponse<string>> UpdateAsync(long userids,UpdateUserDto dto, long modifiedBy)
         {
             try
             {
-                var user = await _repo.GetByIdAsync(dto.Userid);
+                var user = await _repo.GetByIdAsync(userids);
 
                 if (user == null)
                     return ApiResponse<string>.FailResponse("User not found");
@@ -151,6 +154,8 @@ namespace Backend.Service.Implement
                 if (user == null)
                     return ApiResponse<string>.FailResponse("User not found");
 
+
+                user.Isactive = false;
                 user.Modifiedby = modifiedBy;
                 user.Modifiedat = DateTime.UtcNow;
 

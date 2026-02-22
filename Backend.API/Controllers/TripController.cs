@@ -9,21 +9,24 @@ namespace Backend.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    [Authorize]
+    public class TripController : ControllerBase
     {
-        private readonly IUserService _service;
+        private readonly ITripService _service;
 
-        public UsersController(IUserService service)
+        public TripController(ITripService service)
         {
             _service = service;
         }
 
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> Create(CreateUserDto dto)
+        [HttpPost("CreateTrip")]
+        public async Task<IActionResult> Create(CreateTripDto dto)
         {
             try
             {
-                var result = await _service.CreateAsync(dto);
+                var userId = long.Parse(User.FindFirst("UserId")!.Value);
+
+                var result = await _service.CreateAsync(dto, userId);
 
                 return Ok(result);
             }
@@ -33,13 +36,12 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpGet("GetUserById")]
+        [HttpGet("GetTripById")]
         public async Task<IActionResult> GetById(long id)
         {
             try
             {
                 var result = await _service.GetByIdAsync(id);
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -48,14 +50,12 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpGet("GetAllUser")]
-        [Authorize]
+        [HttpGet("GetAllTrips")]
         public async Task<IActionResult> GetAll()
         {
             try
             {
                 var result = await _service.GetAllAsync();
-
                 return Ok(result);
             }
             catch (Exception ex)
@@ -64,20 +64,14 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> Update(long userids,UpdateUserDto dto)
+        [HttpPut("UpdateTrip")]
+        public async Task<IActionResult> Update(long tripid, UpdateTripDto dto)
         {
             try
             {
-                var userIdClaim = User.FindFirst("UserId")?.Value;
+                var userId = long.Parse(User.FindFirst("UserId")!.Value);
 
-                if (string.IsNullOrEmpty(userIdClaim))
-                {
-                    return Ok(ApiResponse<object>.FailResponse("Invalid token"));
-                }
-                var userId = long.Parse(userIdClaim);
-
-                var result = await _service.UpdateAsync(userids,dto, userId);
+                var result = await _service.UpdateAsync(tripid,dto, userId);
 
                 return Ok(result);
             }
@@ -87,18 +81,12 @@ namespace Backend.API.Controllers
             }
         }
 
-        [HttpDelete("DeleteUser")]
+        [HttpDelete("DeleteTrip")]
         public async Task<IActionResult> Delete(long id)
         {
             try
             {
-                var userIdClaim = User.FindFirst("UserId")?.Value;
-
-                if (string.IsNullOrEmpty(userIdClaim))
-                {
-                    return Ok(ApiResponse<object>.FailResponse("Invalid token"));
-                }
-                var userId = long.Parse(userIdClaim);
+                var userId = long.Parse(User.FindFirst("UserId")!.Value);
 
                 var result = await _service.DeleteAsync(id, userId);
 
@@ -110,4 +98,5 @@ namespace Backend.API.Controllers
             }
         }
     }
+
 }
